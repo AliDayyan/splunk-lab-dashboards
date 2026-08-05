@@ -1,0 +1,84 @@
+{
+  "title": "FortiGate Live Traffic Log",
+  "description": "Live detailed traffic log from FortiGate",
+  "inputs": {
+    "input_global_trp": {
+      "options": {
+        "defaultValue": "-24h@h,now",
+        "token": "global_time"
+      },
+      "title": "Time Range",
+      "type": "input.timerange"
+    },
+    "input_search_filter": {
+      "options": {
+        "defaultValue": "*",
+        "token": "search_filter"
+      },
+      "title": "Search (IP, device, port...)",
+      "type": "input.text"
+    }
+  },
+  "visualizations": {
+    "viz_live_traffic_table": {
+      "dataSources": {
+        "primary": "ds_live_traffic_table"
+      },
+      "options": {
+        "count": 50
+      },
+      "title": "Live Traffic Log (Detailed)",
+      "type": "splunk.table"
+    }
+  },
+  "dataSources": {
+    "ds_live_traffic_table": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic (srcip=$search_filter$ OR srcport=$search_filter$ OR transip=$search_filter$ OR dstip=$search_filter$ OR dstport=$search_filter$ OR action=$search_filter$ OR vendor_action=$search_filter$ OR service=$search_filter$ OR policyname=$search_filter$ OR sentbyte=$search_filter$ OR rcvdbyte=$search_filter$ OR duration=$search_filter$ OR devname=$search_filter$ OR devid=$search_filter$) | table date, time, srcip, srcport, transip, dstip, dstport, action, vendor_action, service, policyname, sentbyte, rcvdbyte, duration, devname, devid | sort -_time",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    }
+  },
+  "layout": {
+    "globalInputs": [
+      "input_global_trp",
+      "input_search_filter"
+    ],
+    "layoutDefinitions": {
+      "layout_1": {
+        "options": {
+          "display": "auto-scale",
+          "height": 700,
+          "width": 1440
+        },
+        "structure": [
+          {
+            "item": "viz_live_traffic_table",
+            "position": {
+              "h": 680,
+              "w": 1430,
+              "x": 0,
+              "y": 0
+            },
+            "type": "block"
+          }
+        ],
+        "type": "absolute"
+      }
+    },
+    "tabs": {
+      "items": [
+        {
+          "label": "New tab",
+          "layoutId": "layout_1"
+        }
+      ]
+    }
+  }
+}
