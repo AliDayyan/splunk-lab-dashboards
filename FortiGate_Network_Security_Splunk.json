@@ -1,0 +1,600 @@
+{
+  "title": "FortiGate Network Security",
+  "description": "FortiGate traffic, threats, and bandwidth overview (live)",
+  "inputs": {
+    "input_global_trp": {
+      "options": {
+        "defaultValue": "-24h@h,now",
+        "token": "global_time"
+      },
+      "title": "Time Range",
+      "type": "input.timerange"
+    }
+  },
+  "visualizations": {
+    "viz_action_donut": {
+      "dataSources": {
+        "primary": "ds_action_breakdown"
+      },
+      "options": {
+        "legendDisplay": "bottom",
+        "legendTruncation": "ellipsisEnd",
+        "showDonutHole": true
+      },
+      "title": "Traffic by Action",
+      "type": "splunk.pie"
+    },
+    "viz_admin_events_donut": {
+      "dataSources": {
+        "primary": "ds_admin_events_breakdown"
+      },
+      "options": {
+        "legendDisplay": "bottom",
+        "showDonutHole": true
+      },
+      "title": "Events by Type",
+      "type": "splunk.pie"
+    },
+    "viz_admin_events_table": {
+      "dataSources": {
+        "primary": "ds_admin_events_table"
+      },
+      "options": {
+        "count": 20
+      },
+      "title": "Recent Admin & System Events",
+      "type": "splunk.table"
+    },
+    "viz_bandwidth_total": {
+      "dataSources": {
+        "primary": "ds_bandwidth_total"
+      },
+      "options": {
+        "majorColor": "#5ab1e0",
+        "numberPrecision": 2,
+        "trendDisplayMode": "off"
+      },
+      "title": "Total Bandwidth (GB)",
+      "type": "splunk.singlevalue"
+    },
+    "viz_geomap": {
+      "dataSources": {
+        "primary": "ds_geomap"
+      },
+      "options": {
+        "center": [
+          31.171428037093477,
+          -57.40276975457931
+        ],
+        "mapType": "marker",
+        "maxZoom": 10,
+        "minZoom": 1,
+        "zoom": 1.604173147907929
+      },
+      "title": "Traffic Destination Locations",
+      "type": "splunk.map"
+    },
+    "viz_kpi_denied": {
+      "dataSources": {
+        "primary": "ds_denied"
+      },
+      "options": {
+        "numberPrecision": 0,
+        "rangeColors": [
+          "#53a051",
+          "#f8be34",
+          "#dc4e41"
+        ],
+        "rangeValues": [
+          500,
+          1000
+        ],
+        "trendDisplayMode": "off",
+        "useColors": true
+      },
+      "title": "Blocked Connections (Live)",
+      "type": "splunk.singlevalue"
+    },
+    "viz_kpi_threats": {
+      "dataSources": {
+        "primary": "ds_threats"
+      },
+      "options": {
+        "numberPrecision": 0,
+        "rangeColors": [
+          "#53a051",
+          "#f8be34",
+          "#dc4e41"
+        ],
+        "rangeValues": [
+          10,
+          50
+        ],
+        "trendDisplayMode": "off",
+        "useColors": true
+      },
+      "title": "Threats Detected",
+      "type": "splunk.singlevalue"
+    },
+    "viz_kpi_total": {
+      "dataSources": {
+        "primary": "ds_total_traffic"
+      },
+      "options": {
+        "majorColor": "#4faaa3",
+        "numberPrecision": 0,
+        "trendDisplayMode": "off"
+      },
+      "title": "Total Traffic Events",
+      "type": "splunk.singlevalue"
+    },
+    "viz_kpi_unique_src": {
+      "dataSources": {
+        "primary": "ds_unique_src"
+      },
+      "options": {
+        "majorColor": "#8b7fd6",
+        "numberPrecision": 0,
+        "trendDisplayMode": "off"
+      },
+      "title": "Unique Source IPs",
+      "type": "splunk.singlevalue"
+    },
+    "viz_threat_types_donut": {
+      "dataSources": {
+        "primary": "ds_threat_types"
+      },
+      "options": {
+        "legendDisplay": "bottom",
+        "showDonutHole": true
+      },
+      "title": "Threat Types",
+      "type": "splunk.pie"
+    },
+    "viz_top_bandwidth_table": {
+      "dataSources": {
+        "primary": "ds_top_bandwidth"
+      },
+      "options": {
+        "count": 8
+      },
+      "title": "Top Bandwidth Consumers (MB)",
+      "type": "splunk.table"
+    },
+    "viz_top_denied_bar": {
+      "dataSources": {
+        "primary": "ds_top_denied_ips"
+      },
+      "options": {
+        "legendDisplay": "off"
+      },
+      "title": "Top Blocked Source IPs (Live)",
+      "type": "splunk.column"
+    },
+    "viz_top_services_donut": {
+      "dataSources": {
+        "primary": "ds_top_services"
+      },
+      "options": {
+        "legendDisplay": "bottom",
+        "showDonutHole": true
+      },
+      "title": "Top Services",
+      "type": "splunk.pie"
+    },
+    "viz_blocked_timechart": {
+      "dataSources": {
+        "primary": "ds_blocked_timechart"
+      },
+      "options": {
+        "legendDisplay": "bottom"
+      },
+      "title": "Blocked Traffic Over Time (Live)",
+      "type": "splunk.line"
+    },
+    "viz_kpi_allowed": {
+      "dataSources": {
+        "primary": "ds_allowed"
+      },
+      "options": {
+        "majorColor": "#53a051",
+        "numberPrecision": 0,
+        "trendDisplayMode": "off"
+      },
+      "title": "Allowed Connections (Live)",
+      "type": "splunk.singlevalue"
+    },
+    "viz_allowed_timechart": {
+      "dataSources": {
+        "primary": "ds_allowed_timechart"
+      },
+      "options": {
+        "legendDisplay": "bottom"
+      },
+      "title": "Allowed Traffic Over Time (Live)",
+      "type": "splunk.line"
+    }
+  },
+  "dataSources": {
+    "ds_action_breakdown": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic | stats count by action",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_admin_events_breakdown": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_event | stats count by subtype | sort -count | head 8",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_admin_events_table": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_event | table _time, user, action, subtype, logdesc, msg | sort -_time | head 20",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_bandwidth_total": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic | stats sum(sentbyte) as sent sum(rcvdbyte) as recv | eval total_GB=round((sent+recv)/1024/1024/1024,2) | table total_GB",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_denied": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic action=blocked | stats count",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_geomap": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic | iplocation dstip | geostats count by Country",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_threat_types": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_utm | stats count by type | sort -count | head 6",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_threats": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_utm | stats count",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_top_bandwidth": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic | stats sum(sentbyte) as sent sum(rcvdbyte) as recv by srcip | eval total_MB=round((sent+recv)/1024/1024,2) | table srcip total_MB | sort -total_MB | head 8",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_top_denied_ips": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic action=blocked | stats count by srcip | sort -count | head 8",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_top_services": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic | stats count by service | sort -count | head 6",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_total_traffic": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic | stats count",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_unique_src": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic | stats dc(srcip) as count",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_blocked_timechart": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic action=blocked | timechart span=1m count",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_allowed": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic action=allowed | stats count",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    },
+    "ds_allowed_timechart": {
+      "options": {
+        "query": "index=* sourcetype=fortigate_traffic action=allowed | timechart span=1m count",
+        "queryParameters": {
+          "earliest": "$global_time.earliest$",
+          "latest": "$global_time.latest$"
+        },
+        "refresh": "10s",
+        "refreshType": "delay"
+      },
+      "type": "ds.search"
+    }
+  },
+  "layout": {
+    "globalInputs": [
+      "input_global_trp"
+    ],
+    "layoutDefinitions": {
+      "layout_1": {
+        "options": {
+          "display": "auto-scale",
+          "height": 1820,
+          "width": 1440
+        },
+        "structure": [
+          {
+            "item": "viz_kpi_total",
+            "position": {
+              "h": 140,
+              "w": 660,
+              "x": 0,
+              "y": 10
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_kpi_denied",
+            "position": {
+              "h": 190,
+              "w": 660,
+              "x": 0,
+              "y": 160
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_kpi_threats",
+            "position": {
+              "h": 140,
+              "w": 370,
+              "x": 670,
+              "y": 10
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_kpi_unique_src",
+            "position": {
+              "h": 140,
+              "w": 390,
+              "x": 1050,
+              "y": 10
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_kpi_allowed",
+            "position": {
+              "h": 190,
+              "w": 660,
+              "x": 0,
+              "y": 360
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_blocked_timechart",
+            "position": {
+              "h": 190,
+              "w": 770,
+              "x": 670,
+              "y": 160
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_allowed_timechart",
+            "position": {
+              "h": 190,
+              "w": 770,
+              "x": 670,
+              "y": 360
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_action_donut",
+            "position": {
+              "h": 380,
+              "w": 350,
+              "x": 0,
+              "y": 560
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_bandwidth_total",
+            "position": {
+              "h": 180,
+              "w": 350,
+              "x": 0,
+              "y": 960
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_geomap",
+            "position": {
+              "h": 580,
+              "w": 710,
+              "x": 360,
+              "y": 560
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_top_bandwidth_table",
+            "position": {
+              "h": 580,
+              "w": 360,
+              "x": 1080,
+              "y": 560
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_threat_types_donut",
+            "position": {
+              "h": 200,
+              "w": 350,
+              "x": 0,
+              "y": 1160
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_top_services_donut",
+            "position": {
+              "h": 200,
+              "w": 350,
+              "x": 360,
+              "y": 1160
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_top_denied_bar",
+            "position": {
+              "h": 200,
+              "w": 720,
+              "x": 720,
+              "y": 1160
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_admin_events_donut",
+            "position": {
+              "h": 400,
+              "w": 350,
+              "x": 0,
+              "y": 1380
+            },
+            "type": "block"
+          },
+          {
+            "item": "viz_admin_events_table",
+            "position": {
+              "h": 400,
+              "w": 1080,
+              "x": 360,
+              "y": 1380
+            },
+            "type": "block"
+          }
+        ],
+        "type": "absolute"
+      }
+    },
+    "tabs": {
+      "items": [
+        {
+          "label": "New tab",
+          "layoutId": "layout_1"
+        }
+      ]
+    }
+  },
+  "defaults": {
+    "dataSources": {}
+  }
+}
